@@ -16,18 +16,6 @@
       --green: #0EA472; --green-dim: rgba(14,164,114,0.08); --green-line: rgba(14,164,114,0.25);
       --amber: #D97706; --amber-dim: rgba(217,119,6,0.08); --amber-line: rgba(217,119,6,0.28);
     }
-    /* light theme overrides */
-    [data-theme="light"] {
-      --bg: #F4F5F8;
-      --panel: #FFFFFF;
-      --panel2: #F0F1F5;
-      --panel3: #E8E9EF;
-      --text: #0D0F1A;
-      --text2: #4A4F66;
-      --text3: #9A9FB5;
-      --stroke: rgba(0,0,0,0.08);
-      --stroke2: rgba(0,0,0,0.13);
-    }
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
     .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 60% 35% at 50% 0%, rgba(200,16,46,0.05), transparent 70%); }
@@ -203,6 +191,30 @@
     .toast.err { border-color: var(--crimson-line); } .toast.err .toast-bar { background: var(--crimson); }
     .toast.inf { border-color: var(--stroke2);      } .toast.inf .toast-bar { background: var(--text3); }
 
+    /* History */
+    .history-section { margin-bottom: 32px; display: none; }
+    .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .history-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); }
+    .btn-clear-hist { background: none; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text3); transition: color 0.15s; padding: 0; }
+    .btn-clear-hist:hover { color: var(--crimson); }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .hist-item { background: var(--panel); border: 1px solid var(--stroke); border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; transition: border-color 0.15s; }
+    .hist-item:hover { border-color: var(--stroke2); }
+    .hist-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .hist-icon { width: 32px; height: 32px; border-radius: 6px; background: var(--crimson-dim); border: 1px solid var(--crimson-line); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hist-icon svg { width: 14px; height: 14px; color: var(--crimson); }
+    .hist-info { min-width: 0; }
+    .hist-hospital { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .hist-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .hist-tag { padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; }
+    .hist-tag-type { background: var(--panel2); border: 1px solid var(--stroke2); color: var(--text2); }
+    .hist-tag-stable   { background: var(--green-dim);   border: 1px solid var(--green-line);   color: var(--green); }
+    .hist-tag-moderate { background: var(--amber-dim);   border: 1px solid var(--amber-line);   color: var(--amber); }
+    .hist-tag-critical { background: var(--crimson-dim); border: 1px solid var(--crimson-line); color: var(--crimson); }
+    .hist-date { font-size: 10px; color: var(--text3); }
+    .btn-search-again { padding: 7px 12px; border-radius: 5px; border: 1px solid var(--stroke2); background: transparent; color: var(--text2); font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 5px; }
+    .btn-search-again svg { width: 11px; height: 11px; }
+    .btn-search-again:hover { border-color: var(--crimson-line); color: var(--crimson); background: var(--crimson-dim); }
 
     /* Footer */
     .footer { border-top: 1px solid var(--stroke); padding: 24px 28px; text-align: center; font-size: 11px; color: var(--text3); letter-spacing: 0.3px; }
@@ -271,11 +283,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Demo
     </button>
-    <button class="btn-sm" id="theme-toggle" title="Toggle theme" onclick="toggleTheme()">
-      <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <!-- icon updated by script -->
-      </svg>
-    </button>
     <a class="btn-sm" href="login.html" id="signin-link">Sign In</a>
     <button class="btn-sm" id="signout-btn" style="display:none" onclick="signOut()">Sign Out</button>
   </div>
@@ -288,6 +295,15 @@
     <div class="hero-tag"><div class="hero-tag-dot"></div>Emergency Response System</div>
     <h1 class="hero-title">Find the <em>right</em> hospital,<br/>not just the nearest one.</h1>
     <p class="hero-sub">Hospitals ranked by clinical readiness — ICU availability, OT status, bed capacity, and distance — so critical patients reach prepared facilities faster.</p>
+  </div>
+
+  <!-- Previous Searches -->
+  <div class="history-section" id="history-section">
+    <div class="history-header">
+      <div class="history-title">Previous Searches</div>
+      <button class="btn-clear-hist" onclick="clearHistory()">Clear all</button>
+    </div>
+    <div class="history-list" id="history-list"></div>
   </div>
 
   <div class="form-card">
@@ -388,7 +404,6 @@
 
 </main>
 
-
 <footer class="footer">
   Sanjeevni &mdash; Team Sudarshan &mdash; Emergency Hospital Finder &mdash; Hackathon 2025
 </footer>
@@ -397,33 +412,6 @@
   const API = 'http://localhost:3000/api';
   let selType = null, selSev = null, lat = null, lng = null;
   let notified = {}, familyTarget = null;
-
-  // theme support
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('sanjeevni_theme', theme);
-    updateThemeIcon(theme);
-  }
-  function updateThemeIcon(theme) {
-    const icon = document.getElementById('theme-icon');
-    if (!icon) return;
-    if (theme === 'light') {
-      // sun icon
-      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-    } else {
-      // moon icon
-      icon.innerHTML = '<path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 17a7 7 0 009-4.21z"/>';
-    }
-  }
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    applyTheme(current === 'light' ? 'dark' : 'light');
-  }
-  window.addEventListener('load', () => {
-    const stored = localStorage.getItem('sanjeevni_theme');
-    if (stored) applyTheme(stored);
-    else applyTheme('dark');
-  });
 
   // Session
   window.addEventListener('load', () => {
@@ -435,6 +423,7 @@
       document.getElementById('signin-link').style.display = 'none';
       document.getElementById('signout-btn').style.display = 'inline-flex';
     }
+    loadHistory();
   });
 
   function signOut() { localStorage.clear(); window.location.href = 'login.html'; }
@@ -567,6 +556,9 @@
       document.querySelectorAll('.score-fill').forEach(b => { b.style.width = b.dataset.s + '%'; });
     }, 120);
 
+    // Save to history
+    if (list.length) saveHistory(list[0].name);
+
     sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -614,6 +606,62 @@
     } catch {}
     closeModal();
     showToast('Family notification sent.', 'ok');
+  }
+
+  // ── History ──
+  function loadHistory() {
+    if (!localStorage.getItem('sanjeevni_token')) return;
+    const history = JSON.parse(localStorage.getItem('sanjeevni_history') || '[]');
+    if (!history.length) return;
+    const section = document.getElementById('history-section');
+    const list    = document.getElementById('history-list');
+    section.style.display = 'block';
+    list.innerHTML = history.slice(0, 3).map((h, i) => {
+      const date = new Date(h.date);
+      const dateStr = date.toLocaleDateString('en-IN', { day:'numeric', month:'short' }) + ' · ' + date.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+      const sevClass = `hist-tag-${h.severity}`;
+      return `
+      <div class="hist-item">
+        <div class="hist-left">
+          <div class="hist-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <div class="hist-info">
+            <div class="hist-hospital">${h.hospitalName}</div>
+            <div class="hist-meta">
+              <span class="hist-tag hist-tag-type">${h.type}</span>
+              <span class="hist-tag ${sevClass}">${h.severity}</span>
+              <span class="hist-date">${dateStr}</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-search-again" onclick="searchAgain('${h.type}','${h.severity}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          Search Again
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  function saveHistory(hospitalName) {
+    const history = JSON.parse(localStorage.getItem('sanjeevni_history') || '[]');
+    history.unshift({ hospitalName, type: selType, severity: selSev, date: new Date().toISOString() });
+    localStorage.setItem('sanjeevni_history', JSON.stringify(history.slice(0, 5)));
+    loadHistory();
+  }
+
+  function clearHistory() {
+    localStorage.removeItem('sanjeevni_history');
+    document.getElementById('history-section').style.display = 'none';
+  }
+
+  function searchAgain(type, severity) {
+    const typeEl = document.querySelector(`[data-type="${type}"]`);
+    const sevEl  = document.querySelector(`[data-v="${severity}"]`);
+    if (typeEl) selectType(typeEl);
+    if (sevEl)  selectSev(sevEl);
+    document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('Form pre-filled. Update location and search.', 'inf');
   }
 
   function runDemo() {
