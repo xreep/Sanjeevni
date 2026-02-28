@@ -16,24 +16,9 @@
       --green: #0EA472; --green-dim: rgba(14,164,114,0.08); --green-line: rgba(14,164,114,0.25);
       --amber: #D97706; --amber-dim: rgba(217,119,6,0.08); --amber-line: rgba(217,119,6,0.28);
     }
-    /* light theme overrides */
-    [data-theme="light"] {
-      --bg: #F4F5F8;
-      --panel: #FFFFFF;
-      --panel2: #F0F1F5;
-      --panel3: #E8E9EF;
-      --text: #0D0F1A;
-      --text2: #4A4F66;
-      --text3: #9A9FB5;
-      --stroke: rgba(0,0,0,0.08);
-      --stroke2: rgba(0,0,0,0.13);
-    }
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
     .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 50% 30% at 50% 0%, rgba(200,16,46,0.05), transparent 70%); }
-    .theme-toggle { position: absolute; top: 12px; right: 12px; padding: 6px; border: 1px solid var(--stroke2); border-radius: 6px; background: var(--panel2); color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .theme-toggle:hover { color: var(--text); }
-    .theme-toggle svg { width: 18px; height: 18px; }
 
     /* HEADER */
     .header { position: sticky; top: 0; z-index: 100; background: rgba(6,7,12,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid var(--stroke); height: 56px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; }
@@ -215,9 +200,6 @@
       Back
     </a>
     <button class="btn-sm" onclick="signOut()">Sign Out</button>
-    <button class="theme-toggle" id="theme-toggle" title="Toggle theme" onclick="toggleTheme()">
-      <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-    </button>
   </div>
 </header>
 
@@ -434,33 +416,7 @@
 </footer>
 
 <script>
-  const API = 'http://localhost:3000/api';
-  
-  // theme support
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('sanjeevni_theme', theme);
-    updateThemeIcon(theme);
-  }
-  function updateThemeIcon(theme) {
-    const icon = document.getElementById('theme-icon');
-    if (!icon) return;
-    if (theme === 'light') {
-      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-    } else {
-      icon.innerHTML = '<path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 17a7 7 0 009-4.21z"/>';
-    }
-  }
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    applyTheme(current === 'light' ? 'dark' : 'light');
-  }
-  window.addEventListener('load', () => {
-    const stored = localStorage.getItem('sanjeevni_theme');
-    if (stored) applyTheme(stored);
-    else applyTheme('dark');
-  });
-
+  const API = 'https://sudarshan-ngv6.onrender.com/api';
   let currentLoad = 'Low';
   let selectedHospitalId = null;
 
